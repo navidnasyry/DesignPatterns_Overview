@@ -113,4 +113,10 @@ int main() {
 
 ---
 
+### More Refrences:
+1. https://refactoring.guru/design-patterns/builder
+
+
+---
+
 Would you like me to add this directly into your README or create a separate file for Builder pattern examples?
