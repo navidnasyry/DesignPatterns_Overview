@@ -1,11 +1,3 @@
-You're welcome! Here's a detailed explanation of the **Builder Pattern** with:
-
-* A clear use-case in C++
-* A contrasting example where the Builder isn't used
-* The disadvantages of not using the Builder
-
----
-
 ### 🧱 Builder Pattern – In Practice
 
 #### 📝 When to Use Builder

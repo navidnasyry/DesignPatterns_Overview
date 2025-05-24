@@ -1,3 +1,7 @@
+#include<iostream>
+
+using namespace std;
+
 class Computer {
     public:
         std::string CPU, GPU, RAM, Storage;
