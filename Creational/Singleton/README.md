@@ -95,5 +95,3 @@ Despite its benefits, Singleton has drawbacks if **overused**:
 * It can become a **bottleneck** in multithreaded systems if not implemented carefully.
 
 ---
-
-Would you like me to add this Singleton section alongside the Builder explanation in the README or separate it into individual markdown files in your repository?
