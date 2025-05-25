@@ -119,3 +119,125 @@ If you're wondering about using **Builder vs Factory**, here's the distinction:
 | Object Variants     | Same process, different outputs | Different objects from a selection pool |
 | Control Granularity | Fine-grained                    | Coarse-grained                          |
 
+
+
+Excellent question! You're right to raise a concern about the **Open/Closed Principle** in the **Factory Design Pattern** — it *can* violate it in its basic form. Let’s break this down.
+
+---
+
+## 🧩 Does the Factory Pattern Violate Open/Closed Principle?
+
+### 🛑 Yes — In Its Basic Form
+
+In a **basic Factory**, like this:
+
+```cpp
+if (type == "circle") return new Circle();
+else if (type == "square") return new Square();
+```
+
+👉 Every time you add a new type (e.g., `Triangle`), you have to **modify the factory code**. This **violates the Open/Closed Principle**, which states:
+
+> "Software entities should be open for extension but closed for modification."
+
+---
+
+## ✅ How to Solve It: Make Factory Open/Closed
+
+You can solve this by **decoupling the factory logic from the specific product types**, using **a registry or map of creators**.
+
+---
+
+### ✅ Open/Closed Factory Using a Registry (C++ Example)
+
+```cpp
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <functional>
+#include <memory>
+
+// Base product
+class Shape {
+public:
+    virtual void draw() const = 0;
+    virtual ~Shape() {}
+};
+
+// Concrete products
+class Circle : public Shape {
+public:
+    void draw() const override {
+        std::cout << "Drawing Circle\n";
+    }
+};
+
+class Square : public Shape {
+public:
+    void draw() const override {
+        std::cout << "Drawing Square\n";
+    }
+};
+
+// Factory with registration
+class ShapeFactory {
+    using Creator = std::function<std::unique_ptr<Shape>()>;
+    static std::unordered_map<std::string, Creator>& getRegistry() {
+        static std::unordered_map<std::string, Creator> registry;
+        return registry;
+    }
+
+public:
+    static void registerShape(const std::string& name, Creator creator) {
+        getRegistry()[name] = std::move(creator);
+    }
+
+    static std::unique_ptr<Shape> createShape(const std::string& name) {
+        auto it = getRegistry().find(name);
+        if (it != getRegistry().end()) {
+            return (it->second)();
+        }
+        return nullptr;
+    }
+};
+
+// Registration helper
+struct ShapeRegistrar {
+    ShapeRegistrar(const std::string& name, std::function<std::unique_ptr<Shape>()> creator) {
+        ShapeFactory::registerShape(name, creator);
+    }
+};
+
+// Register types
+ShapeRegistrar registerCircle("circle", []() { return std::make_unique<Circle>(); });
+ShapeRegistrar registerSquare("square", []() { return std::make_unique<Square>(); });
+
+int main() {
+    auto shape1 = ShapeFactory::createShape("circle");
+    auto shape2 = ShapeFactory::createShape("square");
+
+    shape1->draw();
+    shape2->draw();
+
+    return 0;
+}
+```
+
+---
+
+## 🧠 Benefits
+
+* 💡 **Adding new shapes requires no changes to `ShapeFactory` itself**.
+* 🧱 New types can be registered in different compilation units (i.e., plugins).
+* ✅ Complies with **Open/Closed Principle**.
+
+---
+
+## 📌 Summary
+
+| Design                     | Open/Closed Compliant? | Drawbacks                                              |
+| -------------------------- | ---------------------- | ------------------------------------------------------ |
+| **Basic Factory**          | ❌ No                   | Must modify factory to add new types                   |
+| **Registry-Based Factory** | ✅ Yes                  | Slightly more complex, requires registration mechanism |
+
+---
